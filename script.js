@@ -24,10 +24,56 @@ function renderToDos() {
   toDoList.innerHTML = "";
   toDos.forEach((toDo) => {
     const newLi = document.createElement("li");
+    const checkbox = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
     const toDotxt = document.createTextNode(toDo.description);
 
+    newLi.appendChild(checkbox);
     newLi.appendChild(toDotxt);
     toDoList.appendChild(newLi);
+
+    if (toDo.done === true) {
+      checkbox.checked = true;
+    } else {
+      checkbox.checked = false;
+    }
+
+    newLi.addEventListener("click", () => {
+      let currentId = toDo.id;
+      if (checkbox.checked === true) {
+        toDo.done = true;
+        uptdatedToDo = {
+          id: currentId,
+          description: toDo.description,
+          done: true,
+        };
+        fetch("http://localhost:4730/todos/" + currentId, {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(uptdatedToDo),
+        })
+          .then((res) => res.json())
+          .then((uptdatedToDoFromApi) => {
+            console.log(uptdatedToDoFromApi);
+          });
+      } else {
+        toDo.done = false;
+        uptdatedToDo = {
+          id: currentId,
+          description: toDo.description,
+          done: false,
+        };
+        fetch("http://localhost:4730/todos/" + currentId, {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(uptdatedToDo),
+        })
+          .then((res) => res.json())
+          .then((uptdatedToDoFromApi) => {
+            console.log(uptdatedToDoFromApi);
+          });
+      }
+    });
   });
 }
 
