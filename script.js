@@ -98,4 +98,19 @@ addBtn.addEventListener("click", () => {
     });
 });
 
+dltBtn.addEventListener("click", () => {
+  toDos.forEach((toDo) => {
+    let currentId = toDo.id;
+    if (toDo.done === true) {
+      fetch("http://localhost:4730/todos/" + currentId, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then(() => {
+          console.log("All Done To Dos deleted.");
+        });
+    }
+  });
+});
+
 loadToDos();
