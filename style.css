@@ -1,0 +1,22 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 1rem;
+}
+
+.lst {
+  padding-left: 0;
+}
+
+.to-dos {
+  list-style-type: none;
+  margin-left: 0;
+}
+
+.to-dos + .to-dos {
+  margin-top: 0.3em;
+}

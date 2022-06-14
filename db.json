@@ -1,24 +1,24 @@
 {
   "todos": [
     {
-      "description": "Get a job",
+      "description": "Say Hello to Ferdi",
       "done": false,
-      "id": 5
+      "id": 1
     },
     {
-      "description": "Hi",
+      "description": "Ask Ferdi about Local Storage and the backend",
       "done": false,
-      "id": 6
+      "id": 2
     },
     {
-      "description": "a",
+      "description": "Ask Ferdi if update-function is also ok in renderToDos",
       "done": false,
-      "id": 8
+      "id": 3
     },
     {
-      "description": "sd",
+      "description": "Ask Ferdi about the console.logs(), which appear only shortly",
       "done": false,
-      "id": 10
+      "id": 4
     }
   ]
 }
