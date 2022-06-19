@@ -36,6 +36,8 @@ function renderToDoApp() {
       const toDotxt = document.createTextNode(toDo.description);
       newLi.append(toDotxt);
       newLi.setAttribute("data-id", toDo.id);
+
+      // newLi.todo = toDo;
     });
   }
 
@@ -87,7 +89,21 @@ function renderToDoApp() {
       })
       .then((newToDoFromApi) => {
         toDos.push(newToDoFromApi);
-        renderToDos();
+
+        // render single todo
+        const newLi = document.createElement("li");
+        newLi.classList.add("to-dos");
+        toDoList.appendChild(newLi);
+
+        const checkbox = document.createElement("input");
+        checkbox.setAttribute("type", "checkbox");
+        checkbox.checked = newToDoFromApi.done;
+        newLi.appendChild(checkbox);
+
+        const toDotxt = document.createTextNode(newToDoFromApi.description);
+        newLi.append(toDotxt);
+        newLi.setAttribute("data-id", newToDoFromApi.id);
+        // renderToDos();
       });
   });
 
