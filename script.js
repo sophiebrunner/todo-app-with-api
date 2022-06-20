@@ -4,33 +4,39 @@ function renderToDoApp() {
   const dltBtn = document.querySelector("#btn-delete");
   const toDoList = document.querySelector("#todo-list");
 
+  toDoList.addEventListener("change", updateToDo);
+  addBtn.addEventListener("click", addToDo);
+  dltBtn.addEventListener("click", deleteDoneToDos);
+
   let toDos = [];
+  loadToDos();
 
   function loadToDos() {
     fetch("http://localhost:4730/todos")
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          console.warn("404. That's an error");
-        }
-      })
-      .then((data) => {
-        toDos = data;
+      .then((res) => resBackend(res))
+      .then((toDosFromApi) => {
+        toDos = toDosFromApi;
         renderToDos();
       });
+  }
+
+  function resBackend(res) {
+    if (res.ok) {
+      return res.json();
+    } else {
+      console.warn("404. That's an error");
+    }
   }
 
   function renderToDos() {
     toDoList.innerHTML = "";
     toDos.forEach((toDo) => {
-      renderToDo(toDo);
-
+      renderSingleToDo(toDo);
       // newLi.todo = toDo;
     });
   }
 
-  function renderToDo(toDo) {
+  function renderSingleToDo(toDo) {
     const newLi = document.createElement("li");
     newLi.classList.add("to-dos");
     toDoList.appendChild(newLi);
@@ -40,13 +46,41 @@ function renderToDoApp() {
     checkbox.checked = toDo.done;
     newLi.appendChild(checkbox);
 
+    const label = document.createElement("label");
+    label.setAttribute("for", toDo.id);
+
     const toDotxt = document.createTextNode(toDo.description);
-    newLi.append(toDotxt);
-    newLi.setAttribute("data-id", toDo.id);
+    label.appendChild(toDotxt);
+
+    newLi.appendChild(label);
+    newLi.setAttribute("id", toDo.id);
   }
 
-  toDoList.addEventListener("change", (e) => {
-    const currentId = e.target.parentElement.getAttribute("data-id");
+  function addToDo() {
+    const newToDo = new toDo();
+
+    fetch("http://localhost:4730/todos", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newToDo),
+    })
+      .then((res) => resBackend(res))
+      .then((newToDoFromApi) => {
+        toDos.push(newToDoFromApi);
+        renderSingleToDo(newToDoFromApi);
+      });
+  }
+  class toDo {
+    constructor(description, done) {
+      this.description = userInput.value;
+      this.done = false;
+    }
+  }
+
+  function updateToDo(e) {
+    const currentId = e.target.parentElement.getAttribute("id");
     const updatedToDo = {
       description: e.target.nextSibling.textContent,
       done: e.target.checked,
@@ -57,64 +91,21 @@ function renderToDoApp() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(updatedToDo),
     })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          console.warn("404. That's an error");
-        }
-      })
-      .then((updatedData) => {
+      .then((res) => resBackend(res))
+      .then(() => {
         loadToDos();
-        console.log(updatedData);
       });
-  });
+  }
 
-  addBtn.addEventListener("click", () => {
-    const newToDoTxt = userInput.value;
-    const newToDo = {
-      description: newToDoTxt,
-      done: false,
-    };
-
-    fetch("http://localhost:4730/todos", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(newToDo),
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          console.warn("404. That's an error");
-        }
-      })
-      .then((newToDoFromApi) => {
-        toDos.push(newToDoFromApi);
-
-        renderToDo(newToDoFromApi);
-
-        // renderToDos();
-      });
-  });
-
-  dltBtn.addEventListener("click", () => {
+  function deleteDoneToDos() {
     toDos.forEach((toDo) => {
       const currentId = toDo.id;
       if (toDo.done === true) {
         fetch("http://localhost:4730/todos/" + currentId, {
           method: "DELETE",
-        })
-          .then((res) => res.json())
-          .then((res) => {
-            console.log(currentId);
-          });
+        }).then((res) => resBackend(res));
       }
     });
-  });
-
-  loadToDos();
+  }
 }
 renderToDoApp();
