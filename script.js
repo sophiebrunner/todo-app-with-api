@@ -43,21 +43,22 @@ function renderToDoApp() {
 
     const checkbox = document.createElement("input");
     checkbox.setAttribute("type", "checkbox");
+    checkbox.id = toDo.id;
     checkbox.checked = toDo.done;
     newLi.appendChild(checkbox);
 
     const label = document.createElement("label");
-    label.setAttribute("for", toDo.id);
+    label.setAttribute("for", checkbox.id);
 
     const toDotxt = document.createTextNode(toDo.description);
     label.appendChild(toDotxt);
 
     newLi.appendChild(label);
-    newLi.setAttribute("id", toDo.id);
+    newLi.dataset.id = toDo.id;
   }
 
   function addToDo() {
-    const newToDo = new toDo();
+    const newToDo = new ToDo(userInput.value);
 
     fetch("http://localhost:4730/todos", {
       method: "POST",
@@ -70,17 +71,18 @@ function renderToDoApp() {
       .then((newToDoFromApi) => {
         toDos.push(newToDoFromApi);
         renderSingleToDo(newToDoFromApi);
+        userInput.value = "";
       });
   }
-  class toDo {
-    constructor(description, done) {
-      this.description = userInput.value;
+  class ToDo {
+    constructor(description) {
+      this.description = description;
       this.done = false;
     }
   }
 
   function updateToDo(e) {
-    const currentId = e.target.parentElement.getAttribute("id");
+    const currentId = e.target.parentElement.dataset.id;
     const updatedToDo = {
       description: e.target.nextSibling.textContent,
       done: e.target.checked,
@@ -103,7 +105,9 @@ function renderToDoApp() {
       if (toDo.done === true) {
         fetch("http://localhost:4730/todos/" + currentId, {
           method: "DELETE",
-        }).then((res) => resBackend(res));
+        })
+          .then((res) => resBackend(res))
+          .then(() => loadToDos());
       }
     });
   }
